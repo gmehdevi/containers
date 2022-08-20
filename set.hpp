@@ -1,0 +1,208 @@
+#ifndef SET_H
+#define SET_H
+#include "utils.hpp"
+#include "pair.hpp"
+#include "RB_Tree.hpp"
+#include "tree_iterators.hpp"
+#include "iterators.hpp"
+
+namespace ft
+{
+    template 
+    <
+    class Key,
+    class Compare = std::less<Key>,
+    class Allocator = std::allocator<Key>
+    >
+    class set {
+    public:
+        typedef Key key_type;
+        typedef Key value_type;
+        typedef size_t size_type;
+        typedef ptrdiff_t difference_type ;
+        typedef Compare key_compare;
+        typedef Compare value_compare;
+        typedef Allocator allocator_type;
+        typedef value_type& reference;
+        typedef const value_type& const_reference;
+        typedef typename Allocator::pointer pointer;
+        typedef typename Allocator::const_pointer const_pointer;
+        typedef bidirectional_iterator<value_type, Compare, allocator_type, RB_Node<value_type>>        iterator;
+        typedef bidirectional_iterator<const value_type, Compare, allocator_type, RB_Node<value_type>>  const_iterator;
+        typedef ft::reverse_iterator<iterator>                                                          reverse_iterator;
+        typedef ft::reverse_iterator<const_iterator>                                                    const_reverse_iterator;
+
+    private:
+        typedef RB_Tree<key_type, Compare, Allocator>  Tree;
+        Tree                             *tree;
+        allocator_type                   alloc;
+        key_compare                      k_comp;
+        value_compare                    v_comp;
+    
+    public:
+
+		explicit set(const key_compare &comp = key_compare(),
+              const allocator_type &alloc = allocator_type())
+		:  tree(value_compare(comp)),alloc(alloc),k_comp(comp),v_comp(comp){}		
+
+		template <class InputIterator>
+  		set (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
+		:  tree(value_compare(comp)),alloc(alloc),k_comp(comp),v_comp(comp) {		
+			insert(first, last);
+        }
+
+		set(const set &cpy)
+		:  tree(value_compare(cpy.comp)),alloc(cpy.alloc),k_comp(cpy.k_comp),v_comp(cpy.v_comp) {		
+			this->insert(cpy.begin(), cpy.end());
+		}
+
+		set& operator=(const set& cpy) { 
+			k_comp = cpy.k_comp;
+			v_comp = cpy.v_comp;
+			this->clear();
+			this->insert(cpy.begin(), cpy.end());
+			return *this;
+		}
+        ~set()
+        {}
+
+        allocator_type get_allocator(void)  const {return allocator_type();}
+       
+        //Iterators
+        iterator begin() {
+            return (iterator(tree->minimum(tree->root)));
+        }
+        const_iterator begin() const {
+            return (const_iterator(tree->minimum(tree->root)));
+        }
+        iterator end() {
+            return (iterator(tree->maximum(tree->root)));
+        }
+        const_iterator end() const {
+            return (const_iterator(tree->maximum(tree->root)));
+        }
+
+        iterator rbegin() {
+            return (reverse_iterator(tree->maximum(tree->root)));
+        }
+        const_iterator rbegin() const {
+            return (const_reverse_iterator(tree->maximum(tree->root)));
+        }
+        iterator rend();
+        const_iterator rend() const {
+            return (const_reverse_iterator(tree->minimum(tree->root)));
+        }
+
+        //Capacity
+        bool empty() {
+            return (tree->root == NULL);
+        }
+
+        size_type size() {
+            return count;
+        }
+
+        size_type max_size() {
+            return alloc.max_size();
+        }
+        //Modifiers
+        void clear() {tree->clear();}
+        
+        bool insert( const value_type& value ) {
+            return tree->insert(value).second;
+        }
+
+        iterator insert(iterator hint, const_reference val) {
+            (void) hint;
+            return (iterator(tree->insert(val).first));
+        }
+
+        template< class InputIt>
+        void insert( InputIt first, InputIt last ) {
+            while (first != last) insert(*first++);
+        }
+
+        void erase( iterator pos ) {
+            tree->remove(*pos);
+        }
+        void erase( iterator first, iterator last ) {
+            while (first != last) tree->remove(*first++);
+        }
+
+        size_type erase( const Key& key )  {
+            return tree->remove(key);
+        }
+
+        void swap(set& other) {
+			swap(tree->root,  other.tree->root);
+            swap(tree->count, other.tree->count);
+        }
+        
+        //Lookup
+        size_type count( const Key& key ) const {return (tree->search(key) ?  1 : 0);}
+
+        iterator find( const Key& key ) {return iterator(tree->search(key));}
+        
+        const_iterator find( const Key& key ) const {return const_iterator(tree->search(key));}
+
+        iterator lower_bound( const Key& key ) {
+            return (iterator(tree->search(key)));
+        }
+
+        const_iterator lower_bound( const Key& key ) const {
+            return (const_iterator(tree->search(key)));
+        }
+        
+        iterator upper_bound( const Key& key ) {
+            return (++iterator(tree->search(key)));
+        }
+        const_iterator upper_bound( const Key& key ) const {
+            return (++const_iterator(tree->search(key)));
+        }
+        
+        pair<iterator,iterator> equal_range( const Key& key ) {
+            return (make_pair(lower_bound(key),upper_bound(key)));
+        }
+        pair<const_iterator,const_iterator> equal_range( const Key& key ) const {
+            return (make_pair(lower_bound(key),upper_bound(key)));
+        }
+        //Observers
+        key_compare key_comp() const {return key_compare();}
+
+        value_compare value_comp() const {return value_compare();}
+
+        //Non-member functions
+        friend void swap(set& lhs, set& rhs ) {lhs.swap(rhs);}
+
+        friend bool operator==( const set& lhs, const set& rhs ) {
+            iterator l(lhs.tree->root);
+            iterator r(rhs.tree->root);
+            while (l != l.end() && r != r.end()) {
+                if (l != r) return (0);
+                l++;r++;
+            }
+            return l.end() == r.end() ? 1 : 0; 
+        }
+
+        friend bool operator!=( const set& lhs, const set& rhs ) {
+            return !(lhs == rhs);
+        }
+        friend bool operator<( const set& lhs,const set& rhs ) {
+            return lexicographical_compare(lhs.begin(),lhs.end(),rhs.begin(), rhs.end());
+        }
+        friend bool operator<=( const set& lhs, const set& rhs ) {
+            return lhs == rhs || lhs < rhs;
+        }
+        friend bool operator>( const set& lhs,const set& rhs ) {
+            return lexicographical_compare(rhs.begin(),rhs.end(),lhs.begin(), lhs.end());
+        }
+        friend bool operator>=( const set& lhs, const set& rhs ) {
+            return lhs == rhs || lhs > rhs;
+
+        }
+
+    };
+}
+
+
+#endif 
