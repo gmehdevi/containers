@@ -1,25 +1,32 @@
-SRCS			= main.cpp
-OBJS			= $(SRCS:.cpp=.o)
+CONTAINERS  	= vector map stack pair
+iter        	= #iterators.cpp
+utils       	= #enable_if.cpp is_integral.cpp equal.cpp lexicographical_compare.cpp
+BONUS       	= set
+FT_CONT 		= ./../
 
 CXX				= clang++
 RM				= rm -f
-CXXFLAGS		= -Wall -Wextra -Werror -I. -std=c++98
+CXXFLAGS		= -Wall -Wextra -Werror -ferror-limit=2 -I. -std=c++98
 
 NAME			= container_test
 
-all:			$(NAME)
+all:			
+				./tester/run_test.sh all
 
-$(NAME):		$(OBJS)
-				$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
-
+time:
+				./tester/run_test.sh all time
 clean:
-				$(RM) $(OBJS)
+				$(RM) -f tester/test_ft tester/test_std
+				$(RM) -f ${T_PATH}/test_std ${T_PATH}/test_ft
+bonus:		
+				./tester/run_test.sh bonus
 
 fclean:			clean
-				$(RM) $(NAME)
-
+				$(RM) -f ./tester/res/*
+				$(RM) -f ${T_PATH}time_f ${T_PATH}time_std
 re:				fclean $(NAME)
 
+speed :			
+				./tester/run_test.sh speed
 
-
-.PHONY:			all clean fclean re test
+.PHONY:			all clean fclean re test 42

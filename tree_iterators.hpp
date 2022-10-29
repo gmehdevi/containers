@@ -6,6 +6,7 @@
 #include "iterators.hpp"
 
 namespace ft {
+//last is greater than end() in tree
 
 	template<typename T, typename Compare, typename Alloc, typename Node>
     class bidirectional_iterator : public iterator<ft::bidirectional_iterator_tag, T>
@@ -15,52 +16,44 @@ namespace ft {
         typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::iterator_category     iterator_category;
         typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::value_type            value_type;
         typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::difference_type       difference_type;
-        typedef T*                                                                              pointer;
-        typedef T&                                                                              reference;
-	
+        typedef  T *                           					pointer;
+        typedef  T &                             				reference;
     private:
-        typedef  Node *                                                              		nodePtr;
-		nodePtr _ptr;
-		nodePtr _last;
-		Compare _comp;  
+		typedef Node *											nodePtr;
 	public:
+		nodePtr _ptr;
+		nodePtr _end;
+		Compare _comp;  
 
-
-	/*------------------Constructor------------------*/
-
-		bidirectional_iterator(const nodePtr ptr=NULL, const nodePtr last=NULL)
-		: _ptr(ptr), _last(last), _comp(Compare()) {}
+		bidirectional_iterator(const nodePtr ptr = NULL, const nodePtr tend = NULL)
+		: _ptr(ptr), _end(tend), _comp(Compare()) {}
 
 		bidirectional_iterator(const bidirectional_iterator &cpy)
-		: _ptr(cpy._ptr), _last(cpy._last), _comp(cpy._comp) {}
+		: _ptr(cpy._ptr), _end(cpy._end), _comp(cpy._comp) {}
 
 		bidirectional_iterator &operator=(const bidirectional_iterator &cpy) {
 			_ptr = cpy._ptr;
-			_last = cpy._last;
+			_end = cpy._end;
 			_comp = cpy._comp;
 			return *this;
 		}
 
 		~bidirectional_iterator() {}
 
-		
-	/*------------------Access------------------*/
-
-		reference operator*() const {return  _ptr->val;}
+		reference operator*() const {return  _ptr->data;}
 		pointer operator->() const {return &(**this);}
 
-
-	/*------------------Increment------------------*/
-
 		bidirectional_iterator &operator++() {
-			if (_ptr->right) {
+			if (_ptr && _ptr->right && _ptr->right != _end) {
 				_ptr = _ptr->right;
-				while (_ptr->left) _ptr = _ptr->left;
+				while (_ptr && _ptr->left && _ptr->left != _end) 
+					_ptr = _ptr->left;
 			} else {
-				value_type cur_val = _ptr->val;	
-				while (!_comp(cur_val, _ptr->val))
+				value_type cur_val = _ptr->data;
+				while (_ptr && _ptr != _end && !_comp(cur_val, _ptr->data))
 					_ptr = _ptr->parent;
-			}
+			} 
+			if (!_ptr) _ptr = _end;
 			return *this;
 		}
 
@@ -71,14 +64,15 @@ namespace ft {
 		}
 
 		bidirectional_iterator &operator--() {
-			if (_ptr == _last)
-				_ptr = _ptr->parent;
-			else if (_ptr->left) {
+			if (_ptr == _end)
+				_ptr = _end->parent;
+			else if (_ptr->left && _ptr->left != _end) {
 				_ptr = _ptr->left;
-				while (_ptr->right) _ptr = _ptr->right;
+				while (_ptr->right && _ptr->right != _end) 
+					_ptr = _ptr->right;
 			} else {
-				value_type cur_val =  _ptr->val;	
-				while (!_comp( _ptr->val, cur_val))
+				value_type cur_val =  _ptr->data;	
+				while (_ptr != _end && !_comp( _ptr->data, cur_val))
 					_ptr = _ptr->parent;
 			}
 			return *this;
@@ -90,18 +84,15 @@ namespace ft {
             return out;
 		}
 
-
-	/*------------------Comparaison------------------*/
-
 		friend bool operator==(const bidirectional_iterator &x, const bidirectional_iterator &y) {return (x._ptr == y._ptr);}
 		friend bool operator!=(const bidirectional_iterator &x, const bidirectional_iterator &y) {return (x._ptr != y._ptr);}
 
 
-	/*------------------Conversion------------------*/
-
-		  operator bidirectional_iterator<T, Compare, Alloc, Node> () {
-			return bidirectional_iterator<T, Compare, Alloc, Node> (_ptr, _last);
+		operator bidirectional_iterator<const T, Compare, Alloc, Node> () const {
+			bidirectional_iterator<const T, Compare, Alloc, Node> out(_ptr, _end);
+			return out;
 		}
 	};
+
 }
 #endif

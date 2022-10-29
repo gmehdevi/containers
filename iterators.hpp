@@ -68,7 +68,7 @@ namespace ft
               return *this;
           }
 
-          reference operator [](difference_type n) {return &(*(_ptr + n));} 
+          reference operator [](difference_type n) {return (*(_ptr + n));} 
           reference operator  *() {return *_ptr;}
           pointer   operator ->()  {return _ptr;}
           
@@ -103,8 +103,25 @@ namespace ft
               out += n;
               return out;
           }
+
+          difference_type operator+(const random_access_iterator &r) {
+              return _ptr + r._ptr;
+          }
+
+          friend random_access_iterator operator +(const int &n, random_access_iterator &r) {
+              random_access_iterator out(r);
+              out += n;
+              return out;
+          }
           random_access_iterator operator -(const int &n) {
               random_access_iterator out(*this);
+              out -= n;
+              return out;
+          }
+
+
+          friend random_access_iterator operator -(const int &n, random_access_iterator &r) {
+              random_access_iterator out(r);
               out -= n;
               return out;
           }
@@ -112,21 +129,28 @@ namespace ft
               return _ptr - op._ptr;
           }
 
-          bool operator ==(const random_access_iterator &other) const {return this->_ptr == other._ptr;}
-          bool operator !=(const random_access_iterator &other) const {return this->_ptr != other._ptr;}
-          bool operator < (const random_access_iterator &other) const {return this->_ptr <  other._ptr;}
-          bool operator <=(const random_access_iterator &other) const {return this->_ptr <= other._ptr;}
-          bool operator > (const random_access_iterator &other) const {return this->_ptr >  other._ptr;}
-          bool operator >=(const random_access_iterator &other) const {return this->_ptr >= other._ptr;}
+	      	friend difference_type operator-(const random_access_iterator &a, const random_access_iterator &b) {
+            return a._ptr - b._ptr;
+          }
+          friend bool operator==(const random_access_iterator &a, const random_access_iterator &b) {return a._ptr == b._ptr;}
+          friend bool operator!=(const random_access_iterator &a, const random_access_iterator &b) {return a._ptr != b._ptr;}
+          friend bool operator<(const random_access_iterator &a, const random_access_iterator &b) {return a._ptr < b._ptr;}
+          friend bool operator<=(const random_access_iterator &a, const random_access_iterator &b) {return a._ptr <= b._ptr;}
+          friend bool operator>(const random_access_iterator &a, const random_access_iterator &b) {return a._ptr > b._ptr;}
+          friend bool operator>=(const random_access_iterator &a, const random_access_iterator &b) {return a._ptr >= b._ptr;}
 
-          };
+
+          operator random_access_iterator<const T>() const {
+            random_access_iterator<const T> out(_ptr);
+            return out;
+		      }
+        };
 
 
 
   template <typename Iter>
     class reverse_iterator {
     public:
-
       typedef Iter iterator_type;
       typedef typename Iter::value_type value_type;
       typedef typename Iter::difference_type difference_type;
@@ -139,6 +163,7 @@ namespace ft
     private:
       iterator_type it;
 
+    public:
       reverse_iterator() : it() {}
 
       reverse_iterator(const Iter &it) : it(it) {}
@@ -181,8 +206,6 @@ namespace ft
               --(*this);
               return out;
       }
-    
-
 
           reverse_iterator &operator +=(const int& n) {
               it -= n;
@@ -198,25 +221,25 @@ namespace ft
         return reverse_iterator(base() - n);
           }
 
+      
+      // template<class It1, class It2>
+      // friend typename reverse_iterator<It1>::difference_type operator-(const reverse_iterator<It1> &l, const reverse_iterator<It2> &r) {
+      //   r.it - l.it;
+      // }
+
       template<typename It>
           friend reverse_iterator operator+(const int &n, const reverse_iterator<It> &op) {
         return reverse_iterator(op.base() - n);
           }
 
-          reverse_iterator operator-(const int &n) {
-        return reverse_iterator(base() + n);
-          }
+        reverse_iterator operator-(const int &n) {
+          return reverse_iterator(base() + n);
+        }
 
       template<typename It>
-          friend reverse_iterator operator-(const int &n, const reverse_iterator<It> &op) {
-        return reverse_iterator(op.base() + n);
-          }
-
-
-      template<typename It1, typename It2>
-          friend typename reverse_iterator<It1>::difference_type operator-(const reverse_iterator<It1> &x, const reverse_iterator<It2> &y) {
-        return y.it - x.it;
-          }
+      friend reverse_iterator operator-(const int &n, const reverse_iterator<It> &op) {
+       return reverse_iterator(op.base() + n);
+      }
 
     };
 
@@ -238,12 +261,12 @@ namespace ft
       template <typename It1, typename It2> bool operator>=(const reverse_iterator<It1>& lhs,
           const reverse_iterator<It2>& rhs) {return (lhs.base() <= rhs.base());}
 
-      template<class InputIt>
-      typename iterator_traits<InputIt>::difference_type distance( InputIt first, InputIt last ) {
-          ptrdiff_t dist = 0;
-          while (first++ != last) dist++;
-          return dist;
-      }
+      // template<class InputIt>
+      // typename iterator_traits<InputIt>::difference_type distance( InputIt first, InputIt last ) {
+      //     ptrdiff_t dist = 0;
+      //     while (first++ != last) dist++;
+      //     return dist;
+      // }
 
 }   
 
@@ -251,22 +274,22 @@ namespace ft
 
 	/*------------------Arithmetic------------------*/
 
-        // friend vector_iterator operator+(const int &n, const vector_iterator &op) {
-        //     vector_iterator out(op);
+        // friend random_access_iterator operator+(const int &n, const random_access_iterator &op) {
+        //     random_access_iterator out(op);
         //     out += n;
         //     return out;
         // }
 
 		
-		// friend difference_type operator-(const vector_iterator &a, const vector_iterator &b) {
+		// friend difference_type operator-(const random_access_iterator &a, const random_access_iterator &b) {
     //         return a._ptr - b._ptr;
     //     }
 
 
 	/*------------------Conversion------------------*/
 
-		// operator vector_iterator<const T>() const {
-		// 	vector_iterator<const T> out(_ptr);
+		// operator random_access_iterator<const T>() const {
+		// 	random_access_iterator<const T> out(_ptr);
 		// 	return out;
 		// }
 

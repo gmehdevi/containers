@@ -16,7 +16,6 @@ namespace ft
         return (a > b ? a : b);
     }
 
-
     //enable if
 	template <class T, T v>
 	struct integral_constant {
@@ -107,7 +106,40 @@ namespace ft
     typedef IsFalse type;
     };
 
+    template<typename T>
+	int distance(T first, T end) {
+		int cnt=0;
+		while (first != end) {
+			first++;
+			cnt++;
+		}
+		return cnt;
+	}
 
+    //this is pretty cool actually even if it's ugly
+    template<bool b, typename F, typename T>
+    struct isConst {};
+
+    template<typename T, typename F>
+    struct isConst<0, F, T> {
+        typedef F type;
+    };
+
+    template<typename T, typename F>
+    struct isConst<1, F, T> {
+        typedef T type;
+    };
+    
+	template<typename T = void>
+	struct less {
+		typedef bool result_type;
+		typedef T first_argument_type;
+		typedef T second_argument_type;
+
+		bool operator()(const T &lhs, const T &rhs) const {
+			return (lhs < rhs);
+		}
+	};
 
 }
 

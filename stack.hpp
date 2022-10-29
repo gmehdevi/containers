@@ -16,7 +16,7 @@ namespace ft
 		typedef typename Container::reference reference;
 		typedef typename Container::const_reference const_reference;
 
-    explicit stack( const Container& cont = Container() ) : c(cont);
+    explicit stack( const Container& cont = Container()) : c(cont) {} 
     stack(const stack &other) :c(other.c) {}
     ~stack() {}
     
@@ -43,11 +43,11 @@ namespace ft
     }
     
     //Modifiers
-    void push() {
-        c.push_back();
+    void push(const value_type& value) {
+        c.push_back(value);
     }
     void pop() {
-        c.pop_front();
+        c.pop_back();
     }
     
     //Non-member functions

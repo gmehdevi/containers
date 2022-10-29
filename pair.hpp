@@ -1,6 +1,5 @@
 #ifndef PAIR_H
 #define PAIR_H
-#include <algorithm>
 namespace ft
 {
     template <class T1 , class T2>
@@ -15,18 +14,19 @@ namespace ft
         pair(const T1 &a, const T2 &b)
         : first(a), second(b) {}
 		
-        template<typename T3, typename T4>
-		pair(const pair<T3,T4> &other)
-        :first(T1(other.first)), second(T2(other.second)) {}
+        template<typename U1, typename U2>
+		pair(const pair<U1,U2> &other)
+        :first((other.first)), second((other.second)) {}
 
 		pair &operator=(const pair &other) {
 			first = other.first;
 			second = other.second;
 			return *this;
 		}
-        // operator pair<const T1, const T2>() const {
-		// 	return pair<const T1,const T2> (first, second); | what?
-		// }
+        
+        operator pair<const T1, const T2>() const {
+			return pair<const T1,const T2> (first, second);
+		}
     };
 
     template <typename T1, typename T2>
@@ -69,8 +69,8 @@ namespace ft
     }
 	template<typename T1, typename T2>
 	void swap(pair<T1,T2> &x, pair<T1,T2> &y) {
-		std::swap(x.first, y.first);
-		std::swap(x.second, y.second);
+		swap(x.first, y.first);
+		swap(x.second, y.second);
 	}
 
 	template<typename T1, typename T2>
