@@ -45,15 +45,15 @@ fi
 
 for t in ${TO_COMPILE[@]}; do
 	clang++ -Wall -Wextra -Werror -I. -I${FT_CONT} -std=c++98 ${T_PATH}/${t}  -D FT -o test_ft
+	
 	start=`date +%s.%N`
 	./test_ft ${seed} > ${T_PATH}/res/log_ft.txt  
 	end=`date +%s.%N`
 	ft=$( echo "$end - $start" | bc -l )
-	
-	clang++ -Wall -Wextra -Werror -I. -I${FT_CONT} -std=c++98 ${T_PATH}/${t} -o test_std
-	start=`date +%s.%N`	clang++ -Wall -Wextra -Werror -I. -I${FT_CONT} -std=c++98 ${T_PATH}/${t}  -D FT -o test_ft
-	clang++ -Wall -Wextra -Werror -I. -I${FT_CONT} -std=c++98 ${T_PATH}/${t} -o test_std
 
+	clang++ -Wall -Wextra -Werror -I. -I${FT_CONT} -std=c++98 ${T_PATH}/${t} -o test_std
+	
+	start=`date +%s.%N`	
 	./test_std ${seed} > ${T_PATH}/res/log_std.txt
 	end=`date +%s.%N`
 	std=$( echo "$end - $start" | bc -l )
