@@ -6,7 +6,7 @@
 #include "iterators.hpp"
 
 namespace ft {
-//last is greater than end() in tree
+
 
 	template<typename T, typename Compare, typename Alloc, typename Node>
     class bidirectional_iterator : public iterator<ft::bidirectional_iterator_tag, T>
